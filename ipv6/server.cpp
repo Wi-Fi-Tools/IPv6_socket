@@ -50,6 +50,9 @@ int main() {
     }
 
     std::cout << "Client connected." << std::endl;
+    char client_ip_str[INET6_ADDRSTRLEN];
+    inet_ntop(AF_INET6, &client_addr.sin6_addr, client_ip_str, sizeof(client_ip_str));
+    std::cout << "Client IP: " << client_ip_str << std::endl;
 
     char recv_buffer[BUFFER_SIZE];
     char send_buffer[BUFFER_SIZE];
