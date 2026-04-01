@@ -10,7 +10,7 @@
 #define BUFFER_SIZE 2048
 
 int main() {
-    const char* server_ip = "fe80::e818:d3ff:fefd:c60f"; // awdl ipv6
+    const char* server_ip = "fe80::3881:79ff:fe1f:544f"; // awdl ipv6
 
     // 创建 socket
     int client_socket = socket(AF_INET6, SOCK_STREAM, 0);
