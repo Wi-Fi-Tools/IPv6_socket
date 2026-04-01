@@ -4,6 +4,8 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <netinet/in.h>
+#include <net/if.h>
+
 #define SERVER_PORT 50001
 #define BUFFER_SIZE 2048
 
@@ -15,9 +17,24 @@ int main() {
         return -1;
     }
 
-    // // 允许重用地址，避免 TIME_WAIT 状态导致 bind 失败
-    // int opt = 1;
-    // setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+    // Bind socket to the specified interface (e.g. awdl0)
+    // On Apple platforms, AWDL is a special P2P interface that requires explicit binding
+    #ifdef __APPLE__
+    std::cout << "bind to interface awdl0" << std::endl;
+    std::string interface_name = "awdl0";
+    unsigned int ifindex = if_nametoindex(interface_name.c_str());
+    if (ifindex == 0) {
+        perror("[TcpServer] if_nametoindex() failed");
+        close(server_socket);
+        return -1;
+    }
+    if (setsockopt(server_socket, IPPROTO_IPV6, IPV6_BOUND_IF, &ifindex, sizeof(ifindex)) < 0) {
+        perror("[TcpServer] setsockopt(IPV6_BOUND_IF) failed");
+        close(server_socket);
+        return -1;
+    }
+    printf("[TcpServer] Bound to interface %s (index %u)\n", interface_name.c_str(), ifindex);
+    #endif
 
     // 设置服务器地址结构体
     struct sockaddr_in6 server_addr;
